@@ -91,6 +91,7 @@ enum {
     ARG_format,
     ARG_rate,
     ARG_ibuf,
+    ARG_oversample,
 };
 
 #if MICROPY_PY_MACHINE_I2S_RING_BUF
@@ -358,6 +359,7 @@ MP_NOINLINE static void machine_i2s_init_helper(machine_i2s_obj_t *self, size_t 
         { MP_QSTR_format,   MP_ARG_KW_ONLY | MP_ARG_REQUIRED | MP_ARG_INT,   {.u_int = -1} },
         { MP_QSTR_rate,     MP_ARG_KW_ONLY | MP_ARG_REQUIRED | MP_ARG_INT,   {.u_int = -1} },
         { MP_QSTR_ibuf,     MP_ARG_KW_ONLY | MP_ARG_REQUIRED | MP_ARG_INT,   {.u_int = -1} },
+        { MP_QSTR_oversample, MP_ARG_KW_ONLY | MP_ARG_INT,   {.u_int = 64} },
     };
 
     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];

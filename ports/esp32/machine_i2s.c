@@ -322,6 +322,11 @@ static void mp_machine_i2s_init_helper(machine_i2s_obj_t *self, mp_arg_val_t *ar
     }
     int8_t sd = args[ARG_sd].u_obj == MP_OBJ_NULL ? -1 : machine_pin_get_id(args[ARG_sd].u_obj);
 
+    int16_t oversample = args[ARG_oversample].u_int;
+    if ( !((oversample == 64) || (oversample == 128)) ) {
+        mp_raise_ValueError(MP_ERROR_TEXT("invalid oversampling"));
+    }
+
     // is Mode valid?
     if ((mode != (MICROPY_PY_MACHINE_I2S_CONSTANT_RX)) &&
         (mode != (MICROPY_PY_MACHINE_I2S_CONSTANT_TX)) &&
@@ -430,7 +435,14 @@ static void mp_machine_i2s_init_helper(machine_i2s_obj_t *self, mp_arg_val_t *ar
                 },
             },
         };
-        pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_MAX;
+
+        if (oversample == 64) {
+            pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_8S;
+        } else if (oversample == 128) {
+            pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;
+        } else {
+            // should not happen
+        }
 
         ESP_ERROR_CHECK(i2s_channel_init_pdm_rx_mode(self->i2s_chan_handle, &pdm_cfg));
         #else
