@@ -773,6 +773,7 @@ def link_objects(env, native_qstr_vals_len):
             ]
         )
     }
+    still_unresolved = []
     for sym in env.unresolved_syms:
         assert sym["st_value"] == 0
         if sym.name == "_GLOBAL_OFFSET_TABLE_":
@@ -790,7 +791,9 @@ def link_objects(env, native_qstr_vals_len):
                 sym.section = mp_fun_table_sec
                 sym.mp_fun_table_offset = fun_table[sym.name]
             else:
-                raise LinkError("{}: undefined symbol: {}".format(sym.filename, sym.name))
+                still_unresolved.append(sym)
+    if len(still_unresolved):
+        raise LinkError("Undefined symbols: \n" + '\n'.join([ "{}: {}".format(sym.filename, sym.name) for sym in still_unresolved]))
 
     # Align sections, assign their addresses, and create full_text
     env.full_text = bytearray(env.arch.asm_jump(8))  # dummy, to be filled in later
