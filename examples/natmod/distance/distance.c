@@ -10,9 +10,13 @@ euclidean_argmin(mp_obj_t vectors_obj, mp_obj_t point_obj) {
     // Checking first arg
     mp_buffer_info_t bufinfo;
     mp_get_buffer_raise(vectors_obj, &bufinfo, MP_BUFFER_RW);
+
+// XXX: switching this to 0 makes issue not reproduce. Unsure why...
+#if 1
     if (bufinfo.typecode != 'B') {
         mp_raise_ValueError(MP_ERROR_TEXT("expecting B array (uint8)"));
     }
+#endif
 
     // hardcoded return values
     uint32_t min_dist = 0;

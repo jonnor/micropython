@@ -92,6 +92,7 @@ print(euclidean_argmin)
 idx, dist = euclidean_argmin(vv, p)
 print(idx, dist)
 
+#raise SystemExit
 
 # Do some unrelated things that allocate/free memory
 unrelated = array.array('B', (1337 for _ in range(100)))
@@ -122,7 +123,7 @@ for h in PALETTE_EGA16_HEX:
 
 gc.collect()
 
-raise SystemExit
+
 
 # Run function again
 # crashes with X is not callable
@@ -131,7 +132,7 @@ print(euclidean_argmin)
 idx, dist = euclidean_argmin(vv, p)
 print(idx, dist)
 
-
+#raise SystemExit
 
 # Free the module that contained the function.
 del sys.modules["distance"]
