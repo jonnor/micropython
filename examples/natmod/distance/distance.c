@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#if 0
+#if 1
 #define debug_printf(...) mp_printf(&mp_plat_print, "distance-" __VA_ARGS__)
 #else
 #define debug_printf(...) //(0)
@@ -57,7 +57,7 @@ euclidean_argmin(mp_obj_t vectors_obj, mp_obj_t point_obj) {
         mp_raise_ValueError(MP_ERROR_TEXT("expecting B array (uint8)"));
     }
     const uint8_t *point = bufinfo.buf;
-    const int n_channels = bufinfo.len / sizeof(*values);
+    const int n_channels = bufinfo.len / sizeof(*point);
 
     if ((values_length % n_channels) != 0) {
         mp_raise_ValueError(MP_ERROR_TEXT("vectors length must be divisible by @point dimensions"));
@@ -65,10 +65,15 @@ euclidean_argmin(mp_obj_t vectors_obj, mp_obj_t point_obj) {
 
     const int vector_length = values_length / n_channels;
 
-    debug_printf("in in=%d vectors=%d channels=%d \n", \
-        values_length, vector_length, n_channels
+    debug_printf("in values=%d channels=%d vector=%d \n", \
+        (int)values_length, (int)n_channels, (int)vector_length
     );
 
+#if 1
+    uint32_t min_dist = vector_length;
+    const uint16_t min_index = 1;
+#else
+    
     uint32_t min_dist = 0;
     const uint16_t min_index = \
         compute_euclidean3_argmin_uint8(values, vector_length, point, n_channels, &min_dist);
@@ -76,6 +81,7 @@ euclidean_argmin(mp_obj_t vectors_obj, mp_obj_t point_obj) {
     debug_printf("out idx=%d dist=%d \n", \
         (int)min_index, (int)min_dist
     );
+#endif
 
     return mp_obj_new_tuple(2, ((mp_obj_t []) {
         mp_obj_new_int(min_index),
