@@ -78,7 +78,41 @@ sys.path.append("/userfs")
 
 # Import the native function.
 gc.collect()
+#import features0
 from features0 import factorial
+
+# Run the native function, it should not have been freed or overwritten.
+print(factorial(10))
+
+# Do some unrelated things that allocate/free memory
+import array
+unrelated = array.array('B', (1337 for _ in range(1000)))
+gc.collect()
+
+PALETTE_EGA16_HEX = [
+    '#ffffff',
+    '#aa0000',
+    '#ff55ff',
+    '#ffff55',
+]
+
+def hex_to_rgb8(s : str) -> tuple:
+    assert s[0] == '#'
+
+    r = int(s[1:3], 16)
+    g = int(s[2:4], 16)
+    b = int(s[4:6], 16)
+    return r, g, b
+
+data = []
+for h in PALETTE_EGA16_HEX:
+    data.append(hex_to_rgb8(h))
+
+gc.collect()
+
+# Run function again
+print(factorial(10))
+print('foo')
 
 # Free the module that contained the function.
 del sys.modules["features0"]
@@ -88,7 +122,7 @@ gc.collect()
 
 # Allocate lots of fragmented memory to overwrite anything that was just freed by the GC.
 for i in range(1000):
-    []
+    [0, 0]
 
 # Run the native function, it should not have been freed or overwritten.
 print(factorial(10))
