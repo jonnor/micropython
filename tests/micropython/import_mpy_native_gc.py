@@ -56,7 +56,7 @@ features0_file_contents = {
     # -march=armv6m
     0x1006: b"M\x06\x13\x1f\x02\x004build/features0.native.mpy\x00\x12factorial\x00\x88\x02\x18\xe0\x00\x00\x10\xb5\tK\tJ{D\x9cX\x02!\xe3h\x98G\x03\x00\x01 \x00+\x02\xd0XC\x01;\xfa\xe7\x02!#i\x98G\x10\xbd\xc0Fj\x00\x00\x00\x00\x00\x00\x00\xf8\xb5\nN\nK~D\xf4XChgiXh\xb8G\x05\x00\x07K\x08I\xf3XyDX\x88ck\x98G(\x00\xb8G h\xf8\xbd\xc0F:\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x1e\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x11<\r>\xaf8\x01:\xff",
     # ARCH=xtensawin
-    0x2806:b'M\x06+\x1f\x02\x004build/features0.native.mpy\x00\x12factorial\x00\x86*\x06\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x006A\x001\xfc\xff\x0c+\x883 \xa2 \xe0\x08\x00\x8d\n\x0c\x1a\x8ch\x80\xaa\x82\x0b\x88F\xfd\xff8C\x0c+\xe0\x03\x00-\n\x1d\xf0\x00\x00\x006A\x001\xf1\xff(\x12HS\xa2"\x01\xe0\x04\x00\x91\xef\xff\x88\xd3\xb1\xee\xff-\n\xa2\x19\x01\xe0\x08\x00\xad\x02\xe0\x04\x00(\x03\x1d\xf00\x08\x00\x00\x00\x00\x10\x00\x00\x00\x11\x02\r\x04\x05\x06\xaf\x01\x01\x03\xff'
+    0x2806: b'M\x06+\x1f\x02\x002build/distance.native.mpy\x00 euclidean_argmin\x00\x8cJ\x06\'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00P\x00\x00\x006\x81\x00A\xfa\xff\xad\x02b$A\x0c|\xbd\x01\xe0\x06\x00(!L%W\x12\x108t\xa2\xa07"$7\xe0\x03\x00\x06\x07\x00\x00\x00\x00\x0c|\xbd\x01\xad\x03X\x11\xe0\x06\x00h!\'\x16\x0f"$7Ht<z\xe0\x04\x00\xb1\xec\xff\xe0\x02\x00(\x11 e\xf2\x9c\x16"$7Ht\xa2\xa07\xe0\x04\x00\xb1\xe7\xff\x06\xf9\xff\x00\x00b$\x13HD\x0c+\x0c\x1a\xe0\x04\x00\xa91\x0c+ \xa5\xd2\xe0\x04\x00\xa9A\xcb\xb1\xa2\xa0\x02\xe0\x06\x00-\n\x1d\xf06A\x001\xd8\xff(\x12HS\xa2"\x01\xe0\x04\x00\x91\xd6\xff\x88\xd3\xb1\xd7\xff-\n\xa2\x19\x01\xe0\x08\x00\xad\x02\xe0\x04\x00(\x03\x1d\xf00Xexpecting B array (uint8)\x00vectors length must be divisible by @point dimensions\x00\x00\x00\x00\x00\x18\x00\x00\x00\x11\x02\r\x04\x07\x06\x03\xb1)\x01+\xff'
 }
 
 # Populate armv7m-derived archs based on armv6m.
@@ -70,7 +70,7 @@ if sys_implementation_mpy not in features0_file_contents:
     raise SystemExit
 
 # These are the test .mpy files.
-user_files = {"/features0.mpy": features0_file_contents[sys_implementation_mpy]}
+user_files = {"/distance.mpy": features0_file_contents[sys_implementation_mpy]}
 
 # Create and mount a user filesystem.
 vfs.mount(UserFS(user_files), "/userfs")
@@ -78,21 +78,78 @@ sys.path.append("/userfs")
 
 # Import the native function.
 gc.collect()
-from features0 import factorial
+
+import array
+from distance import euclidean_argmin
+
+vv = array.array('B', [0, 0, 0, 1, 1, 1, 2, 2, 2])
+p = array.array('B', [1, 1, 1])
+
+# Run the native function, it should not have been freed or overwritten.
+print('initial')
+print(euclidean_argmin)
+idx, dist = euclidean_argmin(vv, p)
+print(idx, dist)
+
+
+# Do some unrelated things that allocate/free memory
+unrelated = array.array('B', (1337 for _ in range(100)))
+gc.collect()
+
+PALETTE_EGA16_HEX = [
+    '#ffffff',
+    '#aa0000',
+    '#ff55ff',
+    '#aa0000',
+    '#ff55ff',
+    '#aa0000',
+    '#ff55ff',
+    '#ffff55',
+]
+
+def hex_to_rgb8(s : str) -> tuple:
+    assert s[0] == '#'
+
+    r = int(s[1:3], 16)
+    g = int(s[2:4], 16)
+    b = int(s[4:6], 16)
+    return r, g, b
+
+data = []
+for h in PALETTE_EGA16_HEX:
+    data.append(hex_to_rgb8(h))
+
+gc.collect()
+
+# Run function again
+# crashes with X is not callable
+print('after other')
+print(euclidean_argmin)
+idx, dist = euclidean_argmin(vv, p)
+print(idx, dist)
+
+#raise SystemExit
+
 
 # Free the module that contained the function.
-del sys.modules["features0"]
+del sys.modules["distance"]
 
 # Run a GC cycle which should reclaim the module but not the function.
 gc.collect()
 
 # Allocate lots of fragmented memory to overwrite anything that was just freed by the GC.
 for i in range(1000):
-    []
+    [0, 0]
 
 # Run the native function, it should not have been freed or overwritten.
-print(factorial(10))
+print('after gc')
+print(euclidean_argmin)
+idx, dist = euclidean_argmin(vv, p)
+
 
 # Unmount and undo path addition.
 vfs.umount("/userfs")
 sys.path.pop()
+
+print('finish')
+
