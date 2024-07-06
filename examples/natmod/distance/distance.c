@@ -4,25 +4,18 @@
 #include <stdint.h>
 
 
-// MicroPython API
 static mp_obj_t
 euclidean_argmin(mp_obj_t vectors_obj, mp_obj_t point_obj) {
 
-#if 1
-    // First arg
+    // Checking first arg
     mp_buffer_info_t bufinfo;
     mp_get_buffer_raise(vectors_obj, &bufinfo, MP_BUFFER_RW);
     if (bufinfo.typecode != 'B') {
         mp_raise_ValueError(MP_ERROR_TEXT("expecting B array (uint8)"));
     }
 
-    //const int vector_length = values_length / n_channels;
-    uint32_t min_dist = 0;
-#else
-    uint32_t min_dist = 0;
-
-#endif
     // hardcoded return values
+    uint32_t min_dist = 0;
     const uint16_t min_index = 1;
 
     return mp_obj_new_tuple(2, ((mp_obj_t []) {

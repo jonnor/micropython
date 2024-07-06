@@ -85,6 +85,7 @@ from distance import euclidean_argmin
 vv = array.array('B', [0, 0, 0, 1, 1, 1, 2, 2, 2])
 p = array.array('B', [1, 1, 1])
 
+
 # Run the native function, it should not have been freed or overwritten.
 print('initial')
 print(euclidean_argmin)
@@ -121,6 +122,8 @@ for h in PALETTE_EGA16_HEX:
 
 gc.collect()
 
+raise SystemExit
+
 # Run function again
 # crashes with X is not callable
 print('after other')
@@ -128,7 +131,6 @@ print(euclidean_argmin)
 idx, dist = euclidean_argmin(vv, p)
 print(idx, dist)
 
-#raise SystemExit
 
 
 # Free the module that contained the function.
