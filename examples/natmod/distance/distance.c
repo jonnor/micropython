@@ -15,22 +15,6 @@ euclidean_argmin(mp_obj_t vectors_obj, mp_obj_t point_obj) {
     if (bufinfo.typecode != 'B') {
         mp_raise_ValueError(MP_ERROR_TEXT("expecting B array (uint8)"));
     }
-    //const uint8_t *values = bufinfo.buf;
-    //const int values_length = bufinfo.len / sizeof(*values);
-
-    // Second arg
-    mp_get_buffer_raise(point_obj, &bufinfo, MP_BUFFER_RW);
-    if (bufinfo.typecode != 'B') {
-        mp_raise_ValueError(MP_ERROR_TEXT("expecting B array (uint8)"));
-    }
-    //const uint8_t *point = bufinfo.buf;
-    //const int n_channels = bufinfo.len / sizeof(*point);
-
-#if 0
-    if ((values_length % n_channels) != 0) {
-        mp_raise_ValueError(MP_ERROR_TEXT("vectors length must be divisible by @point dimensions"));
-    }
-#endif
 
     //const int vector_length = values_length / n_channels;
     uint32_t min_dist = 0;
