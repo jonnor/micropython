@@ -88,19 +88,29 @@ def asm_jump_x86(entry):
 
 
 def asm_jump_thumb(entry):
-    # Only signed values that fit in 12 bits are supported
     b_off = entry - 4
-    if b_off >> 11 == 0 or b_off >> 11 == -1:
+    print('asm_jump_thumb', entry, b_off)
+
+    short_jump = b_off >> 11 == 0 or b_off >> 11 == -1
+    short_jump = False
+    if short_jump:
+        # Only signed values that fit in 12 bits are supported
         return struct.pack("<H", 0xE000 | (b_off >> 1 & 0x07FF))
     else:
-        # Use BL instruction
-        # Two 16-bit instructions in sequence
-        # each on form: 1111 HOOO OOOO OOOO
+        # Large jump
+        # push {r0, lr}
+        push = 0xB501
+        # bl <dest>
+        # Two 16-bit instructions in sequence, each on form: 1111 HOOO OOOO OOOO
         # first instruction has H=0, and has high 11 bits of the Offset
         # second instruction has H=1, and has low 11 bits of the Offset
-        b0 = 0xF000 | (b_off >> 12 & 0x07FF)
-        b1 = 0xF800 | (b_off >> 1 & 0x7FF)
-        return struct.pack("<HH", b0, b1)
+        bl0 = 0xF000 | (b_off >> 12 & 0x07FF)
+        bl1 = 0xF800 | (b_off >> 1 & 0x7FF)
+        # pop {r0, pc}
+        pop = 0xBD01
+        out = struct.pack("<HHHH", push, bl0, bl1, pop)
+        print(out)
+        return out 
 
 
 def asm_jump_thumb2(entry):
