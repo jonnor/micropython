@@ -118,10 +118,15 @@ def asm_jump_thumb(entry):
 
         # for BX the least significant bit indicates instruction mode. Must be 1 for thumb
 
+        # adr r0, [pc, #8]
+        #adr = 0xa002
+
         # push {r0}
         push = 0xB401
         # ldr  r0, [pc, #8]
         ldr = 0x4802
+        # add r0, pc
+        addpc = 0x4478
         # mov     ip, r0
         mov = 0x4684
         # pop     {r0}
@@ -129,10 +134,10 @@ def asm_jump_thumb(entry):
         # bx      ip
         bx = 0x4760
         # nop
-        nop = 0xbf00
-        # .word   ADDRESS
-        target = b_off
-        out = struct.pack("<HHHHHHI", push, ldr, mov, pop, bx, nop, target)
+        #nop = 0xbf00
+        # .word   OFFSET
+        target = b_off - 4 # FUDGE
+        out = struct.pack("<HHHHHHI", push, ldr, addpc, mov, pop, bx, target)
         print('veneer jump', target, out)
         return out
 
