@@ -51,7 +51,7 @@
 
 // make this 1 to zero out swept memory to more eagerly
 // detect untraced object still in use
-#define CLEAR_ON_SWEEP (0)
+#define CLEAR_ON_SWEEP (1)
 
 #define WORDS_PER_BLOCK ((MICROPY_BYTES_PER_GC_BLOCK) / MP_BYTES_PER_OBJ_WORD)
 #define BYTES_PER_BLOCK (MICROPY_BYTES_PER_GC_BLOCK)
