@@ -92,11 +92,12 @@ def asm_jump_thumb(entry):
     print('asm_jump_thumb', entry, b_off)
 
     short_jump = b_off >> 11 == 0 or b_off >> 11 == -1
-    short_jump = False
-    if short_jump:
+    short_jump = 3
+    if short_jump == 1:
+        assert b_off >> 11 == 0 or b_off >> 11 == -1, b_off
         # Only signed values that fit in 12 bits are supported
         return struct.pack("<H", 0xE000 | (b_off >> 1 & 0x07FF))
-    else:
+    elif short_jump == 2:
         # Large jump
         # push {r0, lr}
         push = 0xB501
@@ -109,9 +110,31 @@ def asm_jump_thumb(entry):
         # pop {r0, pc}
         pop = 0xBD01
         out = struct.pack("<HHHH", push, bl0, bl1, pop)
-        print(out)
-        return out 
+        print('8 byte jump', out)
+        return out
+    else:
+        # use a veneer / trampoline to do the far jump
+        # NOTE: ip is r12
 
+        # for BX the least significant bit indicates instruction mode. Must be 1 for thumb
+
+        # push {r0}
+        push = 0xB401
+        # ldr  r0, [pc, #8]
+        ldr = 0x4802
+        # mov     ip, r0
+        mov = 0x4684
+        # pop     {r0}
+        pop = 0xbc01
+        # bx      ip
+        bx = 0x4760
+        # nop
+        nop = 0xbf00
+        # .word   ADDRESS
+        target = b_off
+        out = struct.pack("<HHHHHHI", push, ldr, mov, pop, bx, nop, target)
+        print('veneer jump', target, out)
+        return out
 
 def asm_jump_thumb2(entry):
     b_off = entry - 4
