@@ -203,8 +203,10 @@ static mp_obj_t esp32_idf_heap_info(const mp_obj_t cap_in) {
                 MP_OBJ_NEW_SMALL_INT(info.total_free_bytes),   // total free bytes
                 MP_OBJ_NEW_SMALL_INT(info.largest_free_block), // largest free contiguous
                 MP_OBJ_NEW_SMALL_INT(info.minimum_free_bytes), // minimum free seen
+                mp_obj_new_int(heap->start),                
+                mp_obj_new_int(heap->end),
             };
-            mp_obj_t this_heap = mp_obj_new_tuple(4, data);
+            mp_obj_t this_heap = mp_obj_new_tuple(6, data);
             mp_obj_list_append(heap_list, this_heap);
         }
     }
