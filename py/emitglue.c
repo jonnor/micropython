@@ -150,6 +150,7 @@ void mp_emit_glue_assign_native(mp_raw_code_t *rc, mp_raw_code_kind_t kind, cons
 
     #if DEBUG_PRINT
     DEBUG_printf("assign native: kind=%d fun=%p len=" UINT_FMT " flags=%x\n", kind, fun_data, fun_len, (uint)scope_flags);
+#if 0
     for (mp_uint_t i = 0; i < fun_len; i+=4) {
         if (i > 0 && i % 16 == 0) {
             DEBUG_printf("\n");
@@ -157,6 +158,7 @@ void mp_emit_glue_assign_native(mp_raw_code_t *rc, mp_raw_code_kind_t kind, cons
         DEBUG_printf("%d %08x", i, ((const uint32_t *)fun_data)[i]);
     }
     DEBUG_printf("\n");
+#endif
 
     #if WRITE_CODE
     FILE *fp_write_code = fopen("out-code", "wb");
