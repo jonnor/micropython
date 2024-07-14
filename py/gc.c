@@ -169,7 +169,7 @@ static void gc_setup_area(mp_state_mem_area_t *area, void *start, void *end) {
     #if MICROPY_GC_SPLIT_HEAP
     area->next = NULL;
     #endif
-
+#if 0
     DEBUG_printf("GC layout:\n");
     DEBUG_printf("  alloc table at %p, length " UINT_FMT " bytes, "
         UINT_FMT " blocks\n",
@@ -184,12 +184,15 @@ static void gc_setup_area(mp_state_mem_area_t *area, void *start, void *end) {
     DEBUG_printf("  pool at %p, length " UINT_FMT " bytes, "
         UINT_FMT " blocks\n", area->gc_pool_start,
         gc_pool_block_len * BYTES_PER_BLOCK, gc_pool_block_len);
+#endif
 }
 
 void gc_init(void *start, void *end) {
     // align end pointer on block boundary
     end = (void *)((uintptr_t)end & (~(BYTES_PER_BLOCK - 1)));
+#if 0
     DEBUG_printf("Initializing GC heap: %p..%p = " UINT_FMT " bytes\n", start, end, (byte *)end - (byte *)start);
+#endif
 
     gc_setup_area(&MP_STATE_MEM(area), start, end);
 

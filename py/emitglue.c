@@ -39,7 +39,7 @@
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)
-#define WRITE_CODE (1)
+#define WRITE_CODE (0)
 #define DEBUG_printf DEBUG_printf
 #define DEBUG_OP_printf(...) DEBUG_printf(__VA_ARGS__)
 #else // don't print debugging info
@@ -150,15 +150,15 @@ void mp_emit_glue_assign_native(mp_raw_code_t *rc, mp_raw_code_kind_t kind, cons
 
     #if DEBUG_PRINT
     DEBUG_printf("assign native: kind=%d fun=%p len=" UINT_FMT " flags=%x\n", kind, fun_data, fun_len, (uint)scope_flags);
-    for (mp_uint_t i = 0; i < fun_len; i++) {
+    for (mp_uint_t i = 0; i < fun_len; i+=4) {
         if (i > 0 && i % 16 == 0) {
             DEBUG_printf("\n");
         }
-        DEBUG_printf(" %02x", ((const byte *)fun_data)[i]);
+        DEBUG_printf("%d %08x", i, ((const uint32_t *)fun_data)[i]);
     }
     DEBUG_printf("\n");
 
-    #ifdef WRITE_CODE
+    #if WRITE_CODE
     FILE *fp_write_code = fopen("out-code", "wb");
     fwrite(fun_data, fun_len, 1, fp_write_code);
     fclose(fp_write_code);

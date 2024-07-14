@@ -306,3 +306,6 @@ void boardctrl_startup(void);
 #endif
 #endif
 #endif
+
+#define MICROPY_DEBUG_VERBOSE    (1)
+#define MICROPY_DEBUG_PRINTERS      (1)
