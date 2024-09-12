@@ -1,5 +1,6 @@
 /* This example demonstrates the following features in a native module:
     - using floats
+    - calling math functions from libm.a
     - defining additional code in Python (see test.py)
     - have extra C code in a separate file (see prod.c)
 */
@@ -9,6 +10,9 @@
 
 // Include the header for auxiliary C code for this module
 #include "prod.h"
+
+// Include standard library header
+#include <math.h>
 
 // Automatically detect if this module should include double-precision code.
 // If double precision is supported by the target architecture then it can
@@ -26,6 +30,12 @@ static mp_obj_t add(mp_obj_t x, mp_obj_t y) {
     return mp_obj_new_float(mp_obj_get_float(x) + mp_obj_get_float(y));
 }
 static MP_DEFINE_CONST_FUN_OBJ_2(add_obj, add);
+
+// A function that uses libm
+static mp_obj_t call_sin(mp_obj_t x) {
+    return mp_obj_new_float(sin(mp_obj_get_float(x)));
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(sin_obj, call_sin);
 
 // A function that explicitly uses single precision floats
 static mp_obj_t add_f(mp_obj_t x, mp_obj_t y) {
@@ -70,6 +80,7 @@ mp_obj_t mpy_init(mp_obj_fun_bc_t *self, size_t n_args, size_t n_kw, mp_obj_t *a
 
     // Make the functions available in the module's namespace
     mp_store_global(MP_QSTR_add, MP_OBJ_FROM_PTR(&add_obj));
+    mp_store_global(MP_QSTR_sin, MP_OBJ_FROM_PTR(&sin_obj));
     mp_store_global(MP_QSTR_add_f, MP_OBJ_FROM_PTR(&add_f_obj));
     #if USE_DOUBLE
     mp_store_global(MP_QSTR_add_d, MP_OBJ_FROM_PTR(&add_d_obj));

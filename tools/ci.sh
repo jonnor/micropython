@@ -122,6 +122,7 @@ export IDF_CCACHE_ENABLE=1
 
 function ci_esp32_idf_setup {
     pip3 install pyelftools
+    pip3 install ar
     git clone --depth 1 --branch $IDF_VER https://github.com/espressif/esp-idf.git
     # doing a treeless clone isn't quite as good as --shallow-submodules, but it
     # is smaller than full clones and works when the submodule commit isn't a head.
@@ -336,6 +337,7 @@ function ci_samd_build {
 function ci_stm32_setup {
     ci_gcc_arm_setup
     pip3 install pyelftools
+    pip3 install ar
     pip3 install pyhy
 }
 
@@ -499,6 +501,7 @@ function ci_unix_standard_v2_run_tests {
 function ci_unix_coverage_setup {
     sudo pip3 install setuptools
     sudo pip3 install pyelftools
+    sudo pip3 install ar
     gcc --version
     python3 --version
 }
@@ -547,6 +550,7 @@ function ci_unix_32bit_setup {
     sudo apt-get install gcc-multilib g++-multilib libffi-dev:i386
     sudo pip3 install setuptools
     sudo pip3 install pyelftools
+    sudo pip3 install ar
     gcc --version
     python3 --version
 }
