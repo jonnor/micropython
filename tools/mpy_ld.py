@@ -30,6 +30,7 @@ Link .o files to .mpy
 
 import sys, os, struct, re
 from elftools.elf import elffile
+import ar_util
 
 sys.path.append(os.path.dirname(__file__) + "/../py")
 import makeqstrdata as qstrutil
@@ -668,8 +669,8 @@ def do_relocation_data(env, text_addr, r):
         assert 0, r_info_type
 
 
-def load_object_file(env, felf):
-    with open(felf, "rb") as f:
+def load_object_file(env, f, felf):
+    if 1:  # Temporary, to preserve indent
         elf = elffile.ELFFile(f)
         env.check_arch(elf["e_machine"])
 
@@ -705,6 +706,7 @@ def load_object_file(env, felf):
                         r.sym = symtab[r["r_info_sym"]]
 
         # Link symbols to their sections, and update known and unresolved symbols
+        dup_errors = []
         for sym in symtab:
             sym.filename = felf
             shndx = sym.entry["st_shndx"]
@@ -716,11 +718,13 @@ def load_object_file(env, felf):
                     if sym.name in env.known_syms and not sym.name.startswith(
                         "__x86.get_pc_thunk."
                     ):
-                        raise LinkError("duplicate symbol: {}".format(sym.name))
+                        dup_errors.append("duplicate symbol: {}".format(sym.name))
                     env.known_syms[sym.name] = sym
             elif sym.entry["st_shndx"] == "SHN_UNDEF" and sym["st_info"]["bind"] == "STB_GLOBAL":
                 # Undefined global symbol, needs resolving
                 env.unresolved_syms.append(sym)
+        if len(dup_errors):
+            raise LinkError("\n".join(dup_errors))
 
 
 def link_objects(env, native_qstr_vals_len):
@@ -781,6 +785,8 @@ def link_objects(env, native_qstr_vals_len):
             ]
         )
     }
+
+    undef_errors = []
     for sym in env.unresolved_syms:
         assert sym["st_value"] == 0
         if sym.name == "_GLOBAL_OFFSET_TABLE_":
@@ -798,7 +804,10 @@ def link_objects(env, native_qstr_vals_len):
                 sym.section = mp_fun_table_sec
                 sym.mp_fun_table_offset = fun_table[sym.name]
             else:
-                raise LinkError("{}: undefined symbol: {}".format(sym.filename, sym.name))
+                undef_errors.append("{}: undefined symbol: {}".format(sym.filename, sym.name))
+
+    if len(undef_errors):
+        raise LinkError("\n".join(undef_errors))
 
     # Align sections, assign their addresses, and create full_text
     env.full_text = bytearray(env.arch.asm_jump(8))  # dummy, to be filled in later
@@ -1039,8 +1048,27 @@ def do_link(args):
     log(LOG_LEVEL_2, "qstr vals: " + ", ".join(native_qstr_vals))
     env = LinkEnv(args.arch)
     try:
-        for file in args.files:
-            load_object_file(env, file)
+        # Load object files
+        for fn in args.files:
+            with open(fn, "rb") as f:
+                load_object_file(env, f, fn)
+
+        if args.libs:
+            # Load archive info
+            archives = []
+            for item in args.libs:
+                archives.extend(ar_util.load_archive(item))
+            # List symbols to look for
+            syms = set(sym.name for sym in env.unresolved_syms)
+            # Resolve symbols from libs
+            lib_objs, _ = ar_util.resolve(archives, syms)
+            # Load extra object files from libs
+            for ar, obj in lib_objs:
+                obj_name = ar.fn + ":" + obj
+                log(LOG_LEVEL_2, "using " + obj_name)
+                with ar.open(obj) as f:
+                    load_object_file(env, f, obj_name)
+
         link_objects(env, len(native_qstr_vals))
         build_mpy(env, env.find_addr("mpy_init"), args.output, native_qstr_vals)
     except LinkError as er:
@@ -1058,6 +1086,7 @@ def main():
     cmd_parser.add_argument("--arch", default="x64", help="architecture")
     cmd_parser.add_argument("--preprocess", action="store_true", help="preprocess source files")
     cmd_parser.add_argument("--qstrs", default=None, help="file defining additional qstrs")
+    cmd_parser.add_argument("-l", dest="libs", action="append", help="Static .a libraries to link")
     cmd_parser.add_argument(
         "--output", "-o", default=None, help="output .mpy file (default to input with .o->.mpy)"
     )
