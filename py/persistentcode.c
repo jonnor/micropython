@@ -299,11 +299,24 @@ static mp_raw_code_t *load_raw_code(mp_reader_t *reader, mp_module_context_t *co
                 read_bytes(reader, rodata, rodata_size);
             }
 
+#if 0
             // Viper code with BSS/rodata should not have any children.
             // Reuse the children pointer to reference the BSS/rodata
             // memory so that it is not reclaimed by the GC.
             assert(!has_children);
             children = (void *)data;
+#else
+#if MICROPY_PERSISTENT_CODE_TRACK_RELOC_CODE == 0
+#error "Persistent code tracking mut be enabled"
+#endif
+
+            // Retain a pointer to the BSS/rodata so that it is not reclaimed by the GC.
+            if (MP_STATE_PORT(track_reloc_code_list) == MP_OBJ_NULL) {
+                MP_STATE_PORT(track_reloc_code_list) = mp_obj_new_list(0, NULL);
+            }
+            mp_obj_list_append(MP_STATE_PORT(track_reloc_code_list), MP_OBJ_FROM_PTR(data));
+#endif
+
         }
     }
     #endif
