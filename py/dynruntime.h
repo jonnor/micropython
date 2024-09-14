@@ -221,6 +221,7 @@ static inline void *mp_obj_malloc_helper_dyn(size_t num_bytes, const mp_obj_type
 
 #define MP_DYNRUNTIME_INIT_ENTRY \
     mp_obj_t old_globals = mp_fun_table.swap_globals(self->context->module.globals); \
+    mp_fun_table.store_global(MP_QSTR___init__, MP_OBJ_FROM_PTR(self)); \
     mp_raw_code_truncated_t rc; \
     rc.proto_fun_indicator[0] = MP_PROTO_FUN_INDICATOR_RAW_CODE_0; \
     rc.proto_fun_indicator[1] = MP_PROTO_FUN_INDICATOR_RAW_CODE_1; \
