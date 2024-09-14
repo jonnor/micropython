@@ -132,7 +132,8 @@ print(idx, dist)
 
 
 # Free the module that contained the function.
-del sys.modules["distance"]
+# XXX: Uncommenting this causes crash when calling function
+# del sys.modules["distance"]
 
 # Run a GC cycle which should reclaim the module but not the function.
 gc.collect()
