@@ -590,6 +590,11 @@ def do_relocation_text(env, text_addr, r):
             return
         assert 0
 
+    elif env.arch.name == "EM_ARM" and r_info_type == R_ARM_ABS32:
+        addr = s.section.addr + s["st_value"]
+        reloc = addr + r_addend
+        reloc_type = "le32"
+
     else:
         # Unknown/unsupported relocation
         assert 0, r_info_type
