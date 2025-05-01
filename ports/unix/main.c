@@ -468,7 +468,7 @@ static void sys_set_excecutable(char *argv0) {
 #define PATHLIST_SEP_CHAR ':'
 #endif
 
-MP_NOINLINE int main_(int argc, char **argv);
+int main_(int argc, char **argv);
 
 int micropython_unix_main(int argc, char **argv)
 {
@@ -496,7 +496,7 @@ int main(int argc, char **argv) {
     return micropython_unix_main(argc, argv);
 }
 
-MP_NOINLINE int main_(int argc, char **argv) {
+int main_(int argc, char **argv) {
     #ifdef SIGPIPE
     // Do not raise SIGPIPE, instead return EPIPE. Otherwise, e.g. writing
     // to peer-closed socket will lead to sudden termination of MicroPython

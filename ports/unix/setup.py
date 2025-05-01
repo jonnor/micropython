@@ -16,10 +16,11 @@ ext_modules = [
         "micropython_run",
         ["micropython_run.cpp"],
         include_dirs=[
-            get_pybind_include(),
+            #get_pybind_include(),
+            '/home/jon/projects/emlearn/venv/lib/python3.12/site-packages/pybind11/include'
         ],
         extra_objects=["libmicropython.a"],
-        extra_link_args=["-lffi"],
+        #extra_link_args=["-lffi"],
         language="c++"
     ),
 ]
