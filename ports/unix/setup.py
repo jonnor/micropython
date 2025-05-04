@@ -27,7 +27,7 @@ ext_modules = [
 
 setup(
     name="micropython_run",
-    version="0.1",
+    version="0.1.3",
     author="You",
     description="A minimal MicroPython CPython wrapper using pybind11",
     ext_modules=ext_modules,
