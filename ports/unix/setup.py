@@ -20,14 +20,15 @@ ext_modules = [
             '/home/jon/projects/emlearn/venv/lib/python3.12/site-packages/pybind11/include'
         ],
         extra_objects=["libmicropython.a"],
-        #extra_link_args=["-lffi"],
+        extra_link_args=["-s", "FORCE_FILESYSTEM=1"],
+        #extra_compile_args=["-s", "FORCE_FILESYSTEM=1"],
         language="c++"
     ),
 ]
 
 setup(
     name="micropython_run",
-    version="0.1.3",
+    version="0.1.8",
     author="You",
     description="A minimal MicroPython CPython wrapper using pybind11",
     ext_modules=ext_modules,
