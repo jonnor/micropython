@@ -133,7 +133,11 @@ static int execute_from_lexer(int source_kind, const void *source, mp_parse_inpu
             const char *filename = (const char *)source;
             lex = mp_lexer_new_from_file(qstr_from_str(filename));
         } else { // LEX_SRC_STDIN
+#if MICROPY_HELPER_LEXER_UNIX
             lex = mp_lexer_new_from_fd(MP_QSTR__lt_stdin_gt_, 0, false);
+#else
+            return 0; // FIXME: error handling
+#endif
         }
 
         qstr source_name = lex->source_name;
