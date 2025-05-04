@@ -112,11 +112,11 @@ typedef long mp_off_t;
 
 // Enable the VFS, and enable the posix "filesystem".
 #define MICROPY_ENABLE_FINALISER    (1)
-#define MICROPY_VFS                 (0)
-#define MICROPY_READER_VFS          (0)
-#define MICROPY_HELPER_LEXER_UNIX   (0)
-#define MICROPY_VFS_POSIX           (0)
-#define MICROPY_READER_POSIX        (0)
+#define MICROPY_VFS                 (1)
+#define MICROPY_READER_VFS          (1)
+#define MICROPY_HELPER_LEXER_UNIX   (1)
+#define MICROPY_VFS_POSIX           (1)
+#define MICROPY_READER_POSIX        (1)
 #if MICROPY_PY_FFI || MICROPY_BLUETOOTH_BTSTACK
 #define MICROPY_TRACKED_ALLOC       (1)
 #endif
