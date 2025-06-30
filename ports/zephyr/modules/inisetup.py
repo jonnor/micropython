@@ -1,8 +1,19 @@
 import vfs
 from micropython import const
 
-def check_bootsec(block_dev):
-    buf = bytearray(block_dev.ioctl(5, 0))  # 5 is SEC_SIZE
+def re_flash(block_dev, block_size):
+    buf = bytearray([0xff for _ in range(block_size)])
+    retval = block_dev.writeblocks(0, buf)
+    print("re-flash: writeblocks returned", retval)
+    return retval == 0
+
+def check_bootsec(block_dev, block_size):
+    bsize = block_dev.ioctl(5, 0)  # 5 is SEC_SIZE
+    if block_size != bsize:
+        print(f"block size mismatch: want {block_size}, got {bsize}")
+        if not re_flash(block_dev, block_size):
+            fs_corrupted()
+    buf = bytearray(bsize)
     block_dev.readblocks(0, buf)
     empty = True
     for b in buf:
@@ -33,8 +44,8 @@ by firmware programming).
         time.sleep(3)
 
 
-def setup(block_dev, prog_size=256):
-    check_bootsec(block_dev)
+def setup(block_dev, prog_size=256, block_size=512):
+    check_bootsec(block_dev, block_size)
     print("Performing initial setup")
     if block_dev.info()[4] == "vfs":
         vfs.VfsLfs2.mkfs(block_dev, progsize=prog_size)

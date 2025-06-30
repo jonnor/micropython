@@ -17,7 +17,7 @@ try:
 except OSError:
     import inisetup
 
-    inisetup.setup(block_dev, PROG_SIZE)
+    inisetup.setup(block_dev, PROG_SIZE, BLOCK_SIZE)
 
 sys.path.append("/")
 sys.path.append("/lib")
