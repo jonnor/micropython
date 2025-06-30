@@ -1,5 +1,7 @@
+# This file is run before /boot.py and /main.py.
+import sys
 import gc
-import micropython
+from micropython import const
 from zephyr import FlashArea
 import vfs
 
