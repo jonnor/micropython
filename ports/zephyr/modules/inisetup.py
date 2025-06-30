@@ -2,9 +2,8 @@ import vfs
 from micropython import const
 
 def re_flash(block_dev, block_size):
-    buf = bytearray([0xff for _ in range(block_size)])
-    retval = block_dev.writeblocks(0, buf)
-    print("re-flash: writeblocks returned", retval)
+    retval = block_dev.ioctl(6, 1)  # 6 is ERASE
+    print("re-flash: ioctl(erase) returned", retval)
     return retval == 0
 
 def check_bootsec(block_dev, block_size):
@@ -47,12 +46,8 @@ by firmware programming).
 def setup(block_dev, prog_size=256, block_size=512):
     check_bootsec(block_dev, block_size)
     print("Performing initial setup")
-    if block_dev.info()[4] == "vfs":
-        vfs.VfsLfs2.mkfs(block_dev, progsize=prog_size)
-        fs = vfs.VfsLfs2(block_dev, progsize=prog_size)
-    elif block_dev.info()[4] == "ffat":
-        vfs.VfsFat.mkfs(block_dev, progsize=prog_size)
-        fs = vfs.VfsFat(block_dev, progsize=prog_size)
+    vfs.VfsLfs2.mkfs(block_dev, progsize=prog_size)
+    fs = vfs.VfsLfs2(block_dev, progsize=prog_size)
     vfs.mount(fs, "/")
     with open("boot.py", "w") as f:
         f.write(
