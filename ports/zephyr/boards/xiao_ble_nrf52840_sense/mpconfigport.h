@@ -30,12 +30,3 @@
 #define MICROPY_CONFIG_ROM_LEVEL (MICROPY_CONFIG_ROM_LEVEL_EXTRA_FEATURES)
 
 #define MICROPY_PY_SYS_MODULES (1)
-
-// This is not enabled currently, pending merge of PR #17615
-#define MICROPY_HW_ENABLE_ADC (0)
-#if MICROPY_HW_ENABLE_ADC
-#define MICROPY_PY_MACHINE_ADC (1)
-#define MICROPY_PY_MACHINE_ADC_INCLUDEFILE "ports/zephyr/machine_adc.c"
-#define MICROPY_PY_MACHINE_ADC_READ (1)
-#define MICROPY_PY_MACHINE_ADC_READ_UV (1)
-#endif
