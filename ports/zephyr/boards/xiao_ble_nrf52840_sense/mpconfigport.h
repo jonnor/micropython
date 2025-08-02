@@ -24,9 +24,6 @@
  * THE SOFTWARE.
  */
 
-#include "../mpconfigport.h"
-
-#undef MICROPY_CONFIG_ROM_LEVEL
 #define MICROPY_CONFIG_ROM_LEVEL (MICROPY_CONFIG_ROM_LEVEL_EXTRA_FEATURES)
 
-#define MICROPY_PY_SYS_MODULES (1)
+#include "../mpconfigport.h"
