@@ -77,6 +77,10 @@
 #define MICROPY_PY_MACHINE_PWM      (1)
 #define MICROPY_PY_MACHINE_PWM_INCLUDEFILE "ports/zephyr/machine_pwm.c"
 #define MICROPY_PY_STRUCT           (1)
+
+// errno is needed for mpremote cp to function
+#define MICROPY_PY_ERRNO            (1)
+
 #ifdef CONFIG_NETWORKING
 // If we have networking, we likely want errno comfort
 #define MICROPY_PY_ERRNO            (1)
