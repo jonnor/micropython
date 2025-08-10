@@ -28,3 +28,12 @@
 
 #include "../../mpconfigport.h"
 
+//#define MICROPY_PY_ERRNO            (1)
+
+// Enable dynamic native modules for ARM
+#if 0
+#define MICROPY_EMIT_THUMB                  (1)
+#define MICROPY_EMIT_INLINE_THUMB           (1)
+#define MICROPY_EMIT_THUMB_ARMV7M           (1)
+#define MICROPY_EMIT_INLINE_THUMB_FLOAT     (1)
+#endif
