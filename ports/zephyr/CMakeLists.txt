@@ -33,6 +33,8 @@ set(MICROPY_TARGET      micropython)
 
 include(${MICROPY_DIR}/py/py.cmake)
 include(${MICROPY_DIR}/extmod/extmod.cmake)
+include(${MICROPY_DIR}/py/usermod.cmake)
+
 
 if (CONFIG_MICROPY_FROZEN_MODULES)
     cmake_path(ABSOLUTE_PATH CONFIG_MICROPY_FROZEN_MANIFEST BASE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
@@ -93,6 +95,7 @@ list(TRANSFORM MICROPY_SOURCE_LIB PREPEND ${MICROPY_DIR}/lib/)
 set(MICROPY_SOURCE_QSTR
     ${MICROPY_SOURCE_PY}
     ${MICROPY_SOURCE_EXTMOD}
+    ${MICROPY_SOURCE_USERMOD}
     ${MICROPY_SOURCE_SHARED}
     ${MICROPY_SOURCE_DRIVERS}
     ${MICROPY_SOURCE_LIB}
@@ -111,6 +114,7 @@ zephyr_library_named(${MICROPY_TARGET})
 zephyr_library_include_directories(
     ${MICROPY_INC_CORE}
     ${MICROPY_PORT_DIR}
+    ${MICROPY_INC_USERMOD}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
