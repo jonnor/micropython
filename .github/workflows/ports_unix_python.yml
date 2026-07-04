@@ -24,6 +24,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.21
         env:
           CIBW_BEFORE_BUILD: "echo skipped"
+          CIBW_SKIP: "pp*"
         with:
           package-dir: ports/unix
 
