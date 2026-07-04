@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21
+        uses: pypa/cibuildwheel@v3.4.1
         env:
           CIBW_BEFORE_BUILD: "echo skipped"
           CIBW_SKIP: "pp* cp36-* cp37-* cp38-* cp39-* *_i686 *-musllinux*"
