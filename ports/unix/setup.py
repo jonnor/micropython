@@ -25,7 +25,7 @@ class build_ext(build_ext_original):
         subprocess.check_call(["make", "submodules"], cwd=".")
         subprocess.check_call(["make", "clean", "libmicropython",
             "V=1",
-            "CFLAGS_EXTRA='-fPIC -fno-omit-frame-pointer'",
+            "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer",
         ])
         super().run()
 
