@@ -1,9 +1,14 @@
 name: Python packages (wheels) for Unix port
 
 on:
+  push:
   release:
     types: [published]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build_wheels:
@@ -29,6 +34,7 @@ jobs:
 
   publish:
     needs: build_wheels
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
