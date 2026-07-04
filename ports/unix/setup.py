@@ -42,8 +42,8 @@ ext_modules = [
 ]
 
 setup(
-    name="micropython_run",
-    version="0.1.8",
+    name="jonnor-micropython-unix",
+    version="1.28.0.0",
     author="You",
     description="CPython wrapper for MicroPython Unix port",
     py_modules=["micropython_unix"],
