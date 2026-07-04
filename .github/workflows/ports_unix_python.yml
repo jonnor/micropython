@@ -1,0 +1,60 @@
+name: unix port Python packages (wheels)
+
+on:
+  push:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_wheels:
+    name: Build wheels for ${{ matrix.cibw_platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cibw_platform: linux
+          - os: macos-latest
+            cibw_platform: macos
+          - os: ubuntu-latest
+            cibw_platform: pyodide
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.0.0
+        env:
+          CIBW_BEFORE_ALL: "make -C ports/unix submodules && make -C mpy-cross"
+          CIBW_PLATFORM: ${{ matrix.cibw_platform }}
+          CIBW_SKIP: "cp38-* cp39-* *_i686"
+          CIBW_ENABLE: pyodide-prerelease
+        with:
+          package-dir: ports/unix
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ matrix.cibw_platform }}
+          path: wheelhouse/*.whl
+
+  publish:
+    needs: build_wheels
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      # avoid trying to upload pyodide wheels - not supported by PyPi
+      - run: rm -f dist/*pyodide*.whl
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
