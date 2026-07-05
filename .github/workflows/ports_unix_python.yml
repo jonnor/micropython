@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.4.1
+        uses: pypa/cibuildwheel@v4.0.0
         env:
           CIBW_BEFORE_ALL: "make -C ports/unix submodules && make -C mpy-cross"
           CIBW_PLATFORM: ${{ matrix.cibw_platform }}
