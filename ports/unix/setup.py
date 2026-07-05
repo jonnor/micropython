@@ -2,6 +2,7 @@
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as build_ext_original
 import sys
+import os
 import setuptools
 import subprocess
 
@@ -12,6 +13,7 @@ class get_pybind_include:
         import pybind11
         return pybind11.get_include()
 
+is_pyodide = os.environ.get("PYODIDE") == "1"
 
 class build_ext(build_ext_original):
     """
@@ -22,11 +24,21 @@ class build_ext(build_ext_original):
     pip install "git+https://github.com/micropython/micropython.git@main#subdirectory=ports/unix"
     """
     def run(self):
+
+        extra_args = []
+        if is_pyodide:
+            extra_args += [
+                "MICROPY_PY_BTREE=0", # btree uses headers not available in emscripten
+            ]
+            pass
+
         subprocess.check_call(["make", "submodules"], cwd=".")
         subprocess.check_call(["make", "clean", "libmicropython",
             "V=1",
-            "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer",
-        ])
+            "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer -DMICROPY_UNIX_NO_MAIN=1",
+            "MICROPY_PY_FFI=0", # libffi causes linking error
+            "VARIANT=standard",
+        ] + extra_args)
         super().run()
 
 ext_modules = [
