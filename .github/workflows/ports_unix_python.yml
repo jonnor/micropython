@@ -32,6 +32,7 @@ jobs:
           CIBW_BEFORE_ALL: "make -C ports/unix submodules && make -C mpy-cross"
           CIBW_PLATFORM: ${{ matrix.cibw_platform }}
           CIBW_SKIP: "cp38-* cp39-* *_i686"
+          CIBW_ENABLE: pyodide-prerelease
         with:
           package-dir: ports/unix
 
