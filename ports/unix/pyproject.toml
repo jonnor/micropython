@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jonnor-micropython-unix"
-version = "1.28.0.0"
+version = "1.28.0.2"
 description = "CPython wrapper for MicroPython Unix port"
 authors = [{name = "MicroPython community"}]
 dependencies = ["pybind11"]
