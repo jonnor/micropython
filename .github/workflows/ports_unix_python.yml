@@ -31,7 +31,7 @@ jobs:
         env:
           CIBW_BEFORE_ALL: "make -C ports/unix submodules && make -C mpy-cross"
           CIBW_PLATFORM: ${{ matrix.cibw_platform }}
-          CIBW_SKIP: "pp* cp36-* cp37-* cp38-* cp39-* *_i686 *-musllinux*"
+          CIBW_SKIP: "cp38-* cp39-* *_i686 *-musllinux*"
         with:
           package-dir: ports/unix
 
