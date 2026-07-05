@@ -1,4 +1,4 @@
-name: Python packages (wheels) for Unix port
+name: unix port Python packages (wheels)
 
 on:
   push:
@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels for ${{ matrix.cibw_platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
