@@ -26,11 +26,12 @@ class build_ext(build_ext_original):
     def run(self):
 
         extra_args = []
-        if is_pyodide:
-            extra_args += [
-                "MICROPY_PY_BTREE=0", # btree uses headers not available in emscripten
-            ]
-            pass
+
+        extra_args += [
+            # btree uses headers not available in emscripten
+            # btree #include <sys/cdefs.h> fails gives warning/erro on musl
+            "MICROPY_PY_BTREE=0",
+        ]
 
         subprocess.check_call(["make", "submodules"], cwd=".")
         subprocess.check_call(["make", "clean", "libmicropython",
