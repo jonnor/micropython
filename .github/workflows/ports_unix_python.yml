@@ -53,4 +53,7 @@ jobs:
           path: dist
           merge-multiple: true
 
+      # avoid trying to upload pyodide wheels - not supported by PyPi
+      - run: rm -f dist/*pyodide*.whl
+
       - uses: pypa/gh-action-pypi-publish@release/v1
