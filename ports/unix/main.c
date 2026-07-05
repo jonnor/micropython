@@ -453,9 +453,11 @@ int micropython_unix_main(int argc, char **argv) {
     return main_(argc, argv);
 }
 
+#if !MICROPY_UNIX_NO_MAIN
 int main(int argc, char **argv) {
     return micropython_unix_main(argc, argv);
 }
+#endif
 
 MP_NOINLINE int main_(int argc, char **argv) {
     #ifdef SIGPIPE
