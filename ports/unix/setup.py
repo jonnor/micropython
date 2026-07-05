@@ -44,19 +44,8 @@ ext_modules = [
     ),
 ]
 
+# NOTE: static metadata is in pyproject.toml
 setup(
-    name="jonnor-micropython-unix",
-    version="1.28.0.0",
-    author="You",
-    description="CPython wrapper for MicroPython Unix port",
-    py_modules=["micropython_unix"],
     ext_modules=ext_modules,
     cmdclass={"build_ext": build_ext},
-    zip_safe=False,
-    install_requires=["pybind11"],
-    entry_points={
-        "console_scripts": [
-            "micropython=micropython_unix:main",
-        ],
-    },
 )
