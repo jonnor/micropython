@@ -29,6 +29,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.1
         env:
+          CIBW_BEFORE_ALL: "make submodules && make -C mpy-cross"
           CIBW_PLATFORM: ${{ matrix.cibw_platform }}
           CIBW_SKIP: "pp* cp36-* cp37-* cp38-* cp39-* *_i686 *-musllinux*"
         with:
