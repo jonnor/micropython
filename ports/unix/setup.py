@@ -50,7 +50,7 @@ ext_modules = [
         include_dirs=[
             get_pybind_include(),
         ],
-        extra_objects=["build-standard/libmicropython.a"],
+        extra_objects=["build-standard/libmicropython.lib"],
         #extra_link_args=["-lffi"],
         #extra_link_args=["-s", "FORCE_FILESYSTEM=1"],
         #extra_compile_args=["-s", "FORCE_FILESYSTEM=1"],
