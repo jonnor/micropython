@@ -33,13 +33,14 @@ class build_ext(build_ext_original):
             "MICROPY_PY_BTREE=0",
         ]
 
-        subprocess.check_call(["make", "submodules"], cwd=".")
-        subprocess.check_call(["make", "clean", "libmicropython",
-            "V=1",
-            "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer -DMICROPY_UNIX_NO_MAIN=1",
-            "MICROPY_PY_FFI=0", # libffi causes linking error
-            "VARIANT=standard",
-        ] + extra_args)
+        if False:
+            subprocess.check_call(["make", "submodules"], cwd=".")
+            subprocess.check_call(["make", "clean", "libmicropython",
+                "V=1",
+                "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer -DMICROPY_UNIX_NO_MAIN=1",
+                "MICROPY_PY_FFI=0", # libffi causes linking error
+                "VARIANT=standard",
+            ] + extra_args)
         super().run()
 
 ext_modules = [
