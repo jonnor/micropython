@@ -22,6 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
       - run: msbuild ../../mpy-cross/mpy-cross.vcxproj
       - run: msbuild micropython.vcxproj
 
