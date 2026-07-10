@@ -75,9 +75,7 @@ ext_modules = [
             get_pybind_include(),
         ],
         extra_objects=["../windows/build-standard/micropython.lib"],
-        #extra_link_args=["-lffi"],
-        #extra_link_args=["-s", "FORCE_FILESYSTEM=1"],
-        #extra_compile_args=["-s", "FORCE_FILESYSTEM=1"],
+        extra_link_args=["Bcrypt.lib"],
         language="c++"
     ),
 ]
