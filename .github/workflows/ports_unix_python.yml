@@ -24,6 +24,10 @@ jobs:
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
+
+      - name: Update submodules
+        run: git submodule update --init lib/micropython-lib
+
       - run: msbuild ../../mpy-cross/mpy-cross.vcxproj
         working-directory: ports/windows
 
