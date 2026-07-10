@@ -6,6 +6,16 @@ import os
 import setuptools
 import subprocess
 
+import sysconfig
+
+def get_msvc_platform():
+    arch = sysconfig.get_platform()  # e.g. 'win32', 'win-amd64', 'win-arm64'
+    return {
+        "win32": "Win32",
+        "win-amd64": "x64",
+        "win-arm64": "ARM64",
+    }[arch]
+
 class get_pybind_include:
     """Helper class to determine the pybind11 include path"""
 
@@ -41,6 +51,20 @@ class build_ext(build_ext_original):
                 "MICROPY_PY_FFI=0", # libffi causes linking error
                 "VARIANT=standard",
             ] + extra_args)
+
+        else:
+            msbuild_platform = get_msvc_platform()
+            subprocess.run(
+                [
+                    "msbuild",
+                    "micropython.vcxproj",
+                    "/p:Configuration=Release",
+                    f"/p:Platform={msbuild_platform}",
+                ],
+                cwd="../windows",
+                check=True,
+            )
+    
         super().run()
 
 ext_modules = [
