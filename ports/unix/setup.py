@@ -14,7 +14,7 @@ if target_is_windows:
     extra_objects = ["../windows/build-standard/micropython.lib"]
     extra_link_args = ["Bcrypt.lib"]
 else:
-    extra_objects = ["../unix/build-standard/micropython.a"]
+    extra_objects = ["../unix/build-standard/libmicropython.a"]
     extra_link_args = []
 
 
