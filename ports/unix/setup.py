@@ -57,7 +57,7 @@ class build_ext(build_ext_original):
             subprocess.run(
                 [
                     "msbuild",
-                    "micropython.vcxproj",
+                    "libmicropython.vcxproj",
                     "/p:Configuration=Release",
                     f"/p:Platform={msbuild_platform}",
                 ],
