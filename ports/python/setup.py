@@ -64,13 +64,13 @@ class build_ext(build_ext_original):
                 "MICROPY_PY_BTREE=0",
             ]
             # Unix port, build with make
-            subprocess.check_call(["make", "submodules"], cwd=".")
+            subprocess.check_call(["make", "submodules"], cwd="../unix")
             subprocess.check_call(["make", "clean", "libmicropython",
                 "V=1",
                 "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer -DMICROPY_UNIX_NO_MAIN=1",
                 "MICROPY_PY_FFI=0", # libffi causes linking error
                 "VARIANT=standard",
-            ] + extra_args)
+            ] + extra_args, cwd="../unix")
 
         super().run()
 
