@@ -10,6 +10,14 @@ import sysconfig
 
 target_is_windows = sys.platform == "win32"
 
+if target_is_windows:
+    extra_objects = ["../windows/build-standard/micropython.lib"]
+    extra_link_args = ["Bcrypt.lib"]
+else:
+    extra_objects = ["../unix/build-standard/micropython.a"]
+    extra_link_args = []
+
+
 def get_msvc_platform():
     arch = sysconfig.get_platform()  # e.g. 'win32', 'win-amd64', 'win-arm64'
     return {
@@ -48,8 +56,6 @@ class build_ext(build_ext_original):
                 cwd="../windows",
                 check=True,
             )
-            extra_objects = ["../windows/build-standard/micropython.lib"]
-            extra_link_args = ["Bcrypt.lib"]
 
         else:
             extra_args = [
@@ -65,8 +71,6 @@ class build_ext(build_ext_original):
                 "MICROPY_PY_FFI=0", # libffi causes linking error
                 "VARIANT=standard",
             ] + extra_args)
-            extra_objects = ["../unix/build-standard/micropython.a"]
-            extra_link_args = []
 
         super().run()
 
