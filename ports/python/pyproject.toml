@@ -3,15 +3,15 @@ requires = ["setuptools", "pybind11"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "jonnor-micropython-unix"
+name = "jonnor-micropython"
 version = "1.28.0.2"
-description = "CPython wrapper for MicroPython Unix port"
+description = "CPython wrapper for MicroPython"
 authors = [{name = "MicroPython community"}]
 dependencies = ["pybind11"]
 
 [project.scripts]
-micropython = "micropython_unix:main"
+micropython = "micropython:main"
 
 [tool.setuptools]
-py-modules = ["micropython_unix"]
+py-modules = ["micropython"]
 zip-safe = false

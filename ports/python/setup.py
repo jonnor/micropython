@@ -76,8 +76,8 @@ class build_ext(build_ext_original):
 
 ext_modules = [
     Extension(
-        "micropython_run",
-        ["micropython_run.cpp"],
+        "micropython_module",
+        ["micropython_module.cpp"],
         include_dirs=[
             get_pybind_include(),
         ],

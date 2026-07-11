@@ -1,5 +1,6 @@
-// CPython module for MicroPython Unix port
+// CPython module for MicroPython
 // Allows to run MicroPython code from CPython
+// and to package this easily for pip/PyPi
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -41,7 +42,7 @@ int run_main(std::vector<std::string> args) {
     return ret;
 }
 
-PYBIND11_MODULE(micropython_run, m) {
-    m.doc() = "CPython module for MicroPython Unix port";
+PYBIND11_MODULE(micropython_module, m) {
+    m.doc() = "CPython module for MicroPython";
     m.def("run_main", &run_main, "Run main()");
 }
