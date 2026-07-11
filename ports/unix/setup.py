@@ -52,7 +52,7 @@ class build_ext(build_ext_original):
             extra_link_args = ["Bcrypt.lib"]
 
         else:
-            extra_args = []
+            extra_args = [
                 # btree uses headers not available in emscripten
                 # btree #include <sys/cdefs.h> fails gives warning/erro on musl
                 "MICROPY_PY_BTREE=0",
