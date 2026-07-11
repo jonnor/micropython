@@ -1,4 +1,4 @@
-name: unix port Python packages (wheels)
+name: Python package for MicroPython
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
           CIBW_SKIP: "cp38-* cp39-* *_i686"
           CIBW_ENABLE: pyodide-prerelease
         with:
-          package-dir: ports/unix
+          package-dir: ports/python
 
       - uses: actions/upload-artifact@v7
         with:
