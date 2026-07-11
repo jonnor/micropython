@@ -17,6 +17,12 @@ jobs:
     strategy:
       matrix:
         include:
+          - os: ubuntu-latest
+            cibw_platform: linux
+          - os: macos-latest
+            cibw_platform: macos
+          - os: ubuntu-latest
+            cibw_platform: pyodide
           - os: windows-latest
             cibw_platform: windows
     steps:

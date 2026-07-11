@@ -8,6 +8,8 @@ import subprocess
 
 import sysconfig
 
+target_is_windows = sys.platform == "win32"
+
 def get_msvc_platform():
     arch = sysconfig.get_platform()  # e.g. 'win32', 'win-amd64', 'win-arm64'
     return {
@@ -23,8 +25,6 @@ class get_pybind_include:
         import pybind11
         return pybind11.get_include()
 
-is_pyodide = os.environ.get("PYODIDE") == "1"
-
 class build_ext(build_ext_original):
     """
     Run neccesary make steps before Python module build
@@ -35,24 +35,8 @@ class build_ext(build_ext_original):
     """
     def run(self):
 
-        extra_args = []
-
-        extra_args += [
-            # btree uses headers not available in emscripten
-            # btree #include <sys/cdefs.h> fails gives warning/erro on musl
-            "MICROPY_PY_BTREE=0",
-        ]
-
-        if False:
-            subprocess.check_call(["make", "submodules"], cwd=".")
-            subprocess.check_call(["make", "clean", "libmicropython",
-                "V=1",
-                "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer -DMICROPY_UNIX_NO_MAIN=1",
-                "MICROPY_PY_FFI=0", # libffi causes linking error
-                "VARIANT=standard",
-            ] + extra_args)
-
-        else:
+        if target_is_windows:
+            # For Windows, build with MSVC
             msbuild_platform = get_msvc_platform()
             subprocess.run(
                 [
@@ -64,7 +48,26 @@ class build_ext(build_ext_original):
                 cwd="../windows",
                 check=True,
             )
-    
+            extra_objects = ["../windows/build-standard/micropython.lib"]
+            extra_link_args = ["Bcrypt.lib"]
+
+        else:
+            extra_args = []
+                # btree uses headers not available in emscripten
+                # btree #include <sys/cdefs.h> fails gives warning/erro on musl
+                "MICROPY_PY_BTREE=0",
+            ]
+            # Unix port, build with make
+            subprocess.check_call(["make", "submodules"], cwd=".")
+            subprocess.check_call(["make", "clean", "libmicropython",
+                "V=1",
+                "CFLAGS_EXTRA=-fPIC -fno-omit-frame-pointer -DMICROPY_UNIX_NO_MAIN=1",
+                "MICROPY_PY_FFI=0", # libffi causes linking error
+                "VARIANT=standard",
+            ] + extra_args)
+            extra_objects = ["../unix/build-standard/micropython.a"]
+            extra_link_args = []
+
         super().run()
 
 ext_modules = [
@@ -74,8 +77,8 @@ ext_modules = [
         include_dirs=[
             get_pybind_include(),
         ],
-        extra_objects=["../windows/build-standard/micropython.lib"],
-        extra_link_args=["Bcrypt.lib"],
+        extra_objects=extra_objects,
+        extra_link_args=extra_link_args,
         language="c++"
     ),
 ]
