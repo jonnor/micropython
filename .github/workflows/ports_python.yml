@@ -25,6 +25,9 @@ jobs:
             cibw_platform: pyodide
           - os: windows-latest
             cibw_platform: windows
+          - os: macos-13
+            cibw_platform: macos
+            cibw_archs: x86_64
     steps:
       - uses: actions/checkout@v6
 
@@ -40,6 +43,7 @@ jobs:
           CIBW_SKIP: "cp38-* cp39-* *_i686"
           CIBW_ENABLE: pyodide-prerelease
           CIBW_TEST_COMMAND: "python {package}/test_micropython_module.py"
+          CIBW_ARCHS: ${{ matrix.cibw_archs || 'auto' }}
         with:
           package-dir: ports/python
 
