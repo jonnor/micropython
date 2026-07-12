@@ -21,6 +21,7 @@ jobs:
             cibw_platform: linux
           - os: macos-latest
             cibw_platform: macos
+            cibw_archs: arm64
           - os: ubuntu-latest
             cibw_platform: pyodide
           - os: windows-latest
@@ -49,7 +50,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: wheels-${{ matrix.cibw_platform }}
+          name: wheels-${{ matrix.cibw_platform }}-${{ env.CIBW_ARCHS }}
           path: wheelhouse/*.whl
 
   make_sdist:
