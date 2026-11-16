@@ -20,7 +20,7 @@ INC += -I$(TOP)
 CWARN = -Wall -Werror
 CWARN += -Wextra -Wno-unused-parameter -Wpointer-arith
 CFLAGS += $(INC) $(CWARN) -std=gnu99 $(COPT) $(CFLAGS_EXTRA)
-CFLAGS += -fdata-sections -ffunction-sections -fno-asynchronous-unwind-tables
+CFLAGS += -fdata-sections -ffunction-sections -fno-asynchronous-unwind-tables -Wno-unterminated-string-initialization
 
 # Debugging/Optimization
 ifdef DEBUG
