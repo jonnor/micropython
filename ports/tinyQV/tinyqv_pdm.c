@@ -81,34 +81,54 @@ static mp_obj_t tinyqv_pdm_make_new(const mp_obj_type_t *type, size_t n_args, si
 }
 
 
-static mp_obj_t tinyqv_pdm_read(size_t n_args, const mp_obj_t *args) {
+/*
 
-    //tinyqv_pdm_obj_t *self = MP_OBJ_TO_PTR(args[0]);
+import _pdm
+p = _pdm.Pdm()
+import array
+buf = array.array('h', (0 for _ in range(16000)))
+
+p.read(buf)
+
+print(buf[:200])
+print(buf[-200:])
+
+*/
+
+static mp_obj_t tinyqv_pdm_read(mp_obj_t obj, mp_obj_t buffer_obj) {
+
+    //tinyqv_pdm_obj_t *self = MP_OBJ_TO_PTR(obj);
     //uint32_t offset = mp_obj_get_int(args[1]);
 
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer_raise(buffer_obj, &bufinfo, MP_BUFFER_WRITE);
 
-#if 1
+    const char in_type = bufinfo.typecode;
+    if (in_type != 'h') {
+        mp_raise_ValueError(MP_ERROR_TEXT("unsupported array types"));
+    }
+
+    int16_t *out_buffer = bufinfo.buf;
+
     printf("init start\n------------------------\n");
 
     // Set all outputs to regular mode (not debug)
     set_debug_sel(0xff);
 
-    // gpio 4
     enable_all_outputs();
 
-    // Set all output controlled by our peripheral
+    // Set output controlled by our peripheral
     set_gpio_func(1, 10);
 
     for(int i=0; i<BUFFER_LENGTH; ++i)
     	    buffer[i] = 22223;
 
     *pdm_period = 64;
-    *pdm_select = 0;
+    *pdm_select = 1; // select input pin
     *pdm_enable = 1;
 
     printf("clock on\n");
 
-#if 1
     uint32_t t0 = read_time();
     uint32_t t1 = t0 + 100 * 1000;
     while (read_time() < t1)
@@ -117,10 +137,18 @@ static mp_obj_t tinyqv_pdm_read(size_t n_args, const mp_obj_t *args) {
     // enable interrupt for our peripheral
     enable_interrupt(10);
 
+    // run until full
     while (buffer_idx < BUFFER_LENGTH-100)
 	    ;
     *pdm_enable = 0;
 
+    // copy into called provided buffer
+    for (int i=0; i<BUFFER_LENGTH; i++) {
+        out_buffer[i] = buffer[i];
+    }
+
+
+#if 0
     printf("BEGIN\n");
     for(int i=0; i<BUFFER_LENGTH; i+=8) {
 	    for(int j=0; j<8; ++j) {
@@ -129,15 +157,17 @@ static mp_obj_t tinyqv_pdm_read(size_t n_args, const mp_obj_t *args) {
 	    printf("\n");
     }
     printf("END\n");
-
-#endif
 #endif
 
     //mp_event_handle_nowait();
 
     return MP_OBJ_NEW_SMALL_INT(0);
 }
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(tinyqv_pdm_read_obj, 3, 4, tinyqv_pdm_read);
+//static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(tinyqv_pdm_read_obj, 3, 4, tinyqv_pdm_read);
+
+static MP_DEFINE_CONST_FUN_OBJ_2(tinyqv_pdm_read_obj, tinyqv_pdm_read);
+
+
 
 
 static const mp_rom_map_elem_t tinyqv_pdm_locals_dict_table[] = {

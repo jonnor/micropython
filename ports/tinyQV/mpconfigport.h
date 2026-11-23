@@ -57,6 +57,7 @@ typedef long mp_off_t;
 #define MICROPY_PY_MACHINE_INCLUDEFILE "ports/tinyQV/modmachine.c"
 
 #define MICROPY_PY_MICROPYTHON_RINGIO (1)
+#define MICROPY_PY_ARRAY (1)
 
 #define MICROPY_KBD_EXCEPTION (1)
 
