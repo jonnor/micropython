@@ -65,6 +65,9 @@ CXXFLAGS += $(filter-out -std=c99,$(CFLAGS))
 
 LIBS =
 
+SRC_S = \
+    tinyqv_pdm_isr.s \
+
 SRC_C = \
 	main.c \
 	fatfs_port.c \
@@ -91,6 +94,7 @@ SRC_QSTR += shared/readline/readline.c shared/runtime/pyexec.c main.c tinyqv_psr
 
 OBJ += $(PY_O)
 OBJ += $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
+OBJ += $(addprefix $(BUILD)/, $(SRC_S:.s=.o))
 OBJ += $(addprefix $(BUILD)/, $(SRC_CXX:.cpp=.o))
 OBJ += $(BUILD)/shared/runtime/gchelper_rv32e.o
 

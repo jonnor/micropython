@@ -88,7 +88,7 @@ static mp_obj_t tinyqv_pdm_read(size_t n_args, const mp_obj_t *args) {
 
 
 #if 1
-    printf("init start\n-----------------------------------\n");
+    printf("init start\n------------------------\n");
 
     // Set all outputs to regular mode (not debug)
     set_debug_sel(0xff);
@@ -105,6 +105,8 @@ static mp_obj_t tinyqv_pdm_read(size_t n_args, const mp_obj_t *args) {
     *pdm_period = 64;
     *pdm_select = 0;
     *pdm_enable = 1;
+
+    printf("clock on\n");
 
 #if 1
     uint32_t t0 = read_time();
