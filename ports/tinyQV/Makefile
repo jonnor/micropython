@@ -33,7 +33,7 @@ ifeq ($(CROSS), 1)
 INC += -I$(TINYQV_SDK)
 DFU = $(TOP)/tools/dfu.py
 PYDFU = $(TOP)/tools/pydfu.py
-ARCH = rv32ec_zcb_zicond
+ARCH = rv32ec_zicsr_zcb_zicond
 AFLAGS = -march=$(ARCH) -mabi=ilp32e
 CFLAGS_RV32E = -march=$(ARCH) -mabi=ilp32e -mno-strict-align -nostartfiles -ffreestanding -flto
 CFLAGS += $(INC) -Wall -Werror -std=gnu99 -nostdlib $(CFLAGS_RV32E) $(COPT)
