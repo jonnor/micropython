@@ -125,6 +125,10 @@ static mp_obj_t tinyqv_pdm_read(mp_obj_t obj, mp_obj_t buffer_obj) {
 
     *pdm_period = 64;
     *pdm_select = 1; // select input pin
+
+
+    buffer_idx = 0;
+
     *pdm_enable = 1;
 
     printf("clock on\n");
