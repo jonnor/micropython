@@ -32,7 +32,7 @@
 #include <gpio.h>
 #include <timer.h>
 #include <stdio.h>
-#include <csr.h>
+//#include <csr.h>
 #include <uart.h>
 #include <math.h>
 
@@ -53,7 +53,41 @@ volatile int16_t buffer[BUFFER_LENGTH];
 volatile uint32_t buffer_idx;
 
 
+typedef struct _tinyqv_pdm_obj_t {
+    mp_obj_base_t base;
+    uint32_t base_addr;
+    uint32_t size;
+} tinyqv_pdm_obj_t;
 
+const mp_obj_type_t tinyqv_pdm_type;
+
+
+// TODO: make peripheral number configurable
+// TODO: make base address configurable
+// TODO: create or take a RingIO object
+static mp_obj_t tinyqv_pdm_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *all_args) {
+    // Parse arguments
+    enum { ARG_start, ARG_len };
+    static const mp_arg_t allowed_args[] = {
+        { MP_QSTR_start, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = -1} },
+        { MP_QSTR_len,   MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = -1} },
+    };
+    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+    mp_arg_parse_all_kw_array(n_args, n_kw, all_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+
+    tinyqv_pdm_obj_t *self = mp_obj_malloc(tinyqv_pdm_obj_t, &tinyqv_pdm_type);
+
+    return MP_OBJ_FROM_PTR(self);
+}
+
+
+static mp_obj_t tinyqv_pdm_read(size_t n_args, const mp_obj_t *args) {
+
+    //tinyqv_pdm_obj_t *self = MP_OBJ_TO_PTR(args[0]);
+    //uint32_t offset = mp_obj_get_int(args[1]);
+
+
+#if 1
     printf("init start\n-----------------------------------\n");
 
     // Set all outputs to regular mode (not debug)
@@ -62,7 +96,7 @@ volatile uint32_t buffer_idx;
     // gpio 4
     enable_all_outputs();
 
-    // Set all output 6 to peripheral 10
+    // Set all output controlled by our peripheral
     set_gpio_func(1, 10);
 
     for(int i=0; i<BUFFER_LENGTH; ++i)
@@ -78,6 +112,7 @@ volatile uint32_t buffer_idx;
     while (read_time() < t1)
     	    ;
 
+    // enable interrupt for our peripheral
     enable_interrupt(10);
 
     while (buffer_idx < BUFFER_LENGTH-100)
@@ -94,102 +129,37 @@ volatile uint32_t buffer_idx;
     printf("END\n");
 
 #endif
+#endif
 
-}
+    //mp_event_handle_nowait();
 
-
-
-typedef struct _tinyqv_psram_obj_t {
-    mp_obj_base_t base;
-    uint32_t base_addr;
-    uint32_t size;
-} tinyqv_psram_obj_t;
-
-const mp_obj_type_t tinyqv_psram_type;
-
-static const tinyqv_psram_obj_t tinyqv_psram_fs_obj = {
-    .base = { &tinyqv_psram_type },
-    .base_addr = TINYQV_PSRAM_FS_BASE_ADDR,
-    .size = TINYQV_PSRAM_FS_DEFAULT_SIZE,
-};
-
-static mp_obj_t tinyqv_psram_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *all_args) {
-    // Parse arguments
-    enum { ARG_start, ARG_len };
-    static const mp_arg_t allowed_args[] = {
-        { MP_QSTR_start, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = -1} },
-        { MP_QSTR_len,   MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = -1} },
-    };
-    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-    mp_arg_parse_all_kw_array(n_args, n_kw, all_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
-
-    if (args[ARG_start].u_int == -1 && args[ARG_len].u_int == -1) {
-        // Default singleton object that accesses default filesystem
-        return MP_OBJ_FROM_PTR(&tinyqv_psram_fs_obj);
-    }
-
-    tinyqv_psram_obj_t *self = mp_obj_malloc(tinyqv_psram_obj_t, &tinyqv_psram_type);
-
-    mp_int_t start = args[ARG_start].u_int;
-    if (start == -1) {
-        start = 0;
-    } else if (start < 0 || start >= TINYQV_PSRAM_FS_MAX_SIZE || start % TINYQV_PSRAM_FS_BLOCK_SIZE != 0) {
-        mp_raise_ValueError(NULL);
-    }
-
-    mp_int_t len = args[ARG_len].u_int;
-    if (len == -1) {
-        len = TINYQV_PSRAM_FS_DEFAULT_SIZE;
-    } else if (len < 0 || start + len > TINYQV_PSRAM_FS_MAX_SIZE || len % TINYQV_PSRAM_FS_BLOCK_SIZE != 0) {
-        mp_raise_ValueError(NULL);
-    }
-
-    self->base_addr = TINYQV_PSRAM_FS_BASE_ADDR + start;
-    self->size = len;
-
-    return MP_OBJ_FROM_PTR(self);
-}
-
-static mp_obj_t tinyqv_psram_readblocks(size_t n_args, const mp_obj_t *args) {
-    tinyqv_psram_obj_t *self = MP_OBJ_TO_PTR(args[0]);
-    uint32_t offset = mp_obj_get_int(args[1]) * TINYQV_PSRAM_FS_BLOCK_SIZE;
-    mp_buffer_info_t bufinfo;
-    mp_get_buffer_raise(args[2], &bufinfo, MP_BUFFER_WRITE);
-    if (n_args == 4) {
-        offset += mp_obj_get_int(args[3]);
-    }
-    memcpy(bufinfo.buf, (const void*)(self->base_addr + offset), bufinfo.len);
-    mp_event_handle_nowait();
     return MP_OBJ_NEW_SMALL_INT(0);
 }
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(tinyqv_psram_readblocks_obj, 3, 4, tinyqv_psram_readblocks);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(tinyqv_pdm_read_obj, 3, 4, tinyqv_pdm_read);
 
 
-static const mp_rom_map_elem_t tinyqv_psram_locals_dict_table[] = {
-    { MP_ROM_QSTR(MP_QSTR_readblocks), MP_ROM_PTR(&tinyqv_psram_readblocks_obj) },
-    { MP_ROM_QSTR(MP_QSTR_writeblocks), MP_ROM_PTR(&tinyqv_psram_writeblocks_obj) },
-    { MP_ROM_QSTR(MP_QSTR_ioctl), MP_ROM_PTR(&tinyqv_psram_ioctl_obj) },
+static const mp_rom_map_elem_t tinyqv_pdm_locals_dict_table[] = {
+    { MP_ROM_QSTR(MP_QSTR_read), MP_ROM_PTR(&tinyqv_pdm_read_obj) },
 };
-static MP_DEFINE_CONST_DICT(tinyqv_psram_locals_dict, tinyqv_psram_locals_dict_table);
+static MP_DEFINE_CONST_DICT(tinyqv_pdm_locals_dict, tinyqv_pdm_locals_dict_table);
 
 MP_DEFINE_CONST_OBJ_TYPE(
-    tinyqv_psram_type,
-    MP_QSTR_PSRAMBlockDevice,
+    tinyqv_pdm_type,
+    MP_QSTR_Pdm,
     MP_TYPE_FLAG_NONE,
-    make_new, tinyqv_psram_make_new,
-    buffer, tinyqv_psram_get_buffer,
-    locals_dict, &tinyqv_psram_locals_dict
+    make_new, tinyqv_pdm_make_new,
+    locals_dict, &tinyqv_pdm_locals_dict
     );
 
-static const mp_rom_map_elem_t psram_module_globals_table[] = {
-    { MP_ROM_QSTR(MP_QSTR___name__),            MP_ROM_QSTR(MP_QSTR__psram) },
-    { MP_ROM_QSTR(MP_QSTR_PSRAMBlockDevice),    MP_ROM_PTR(&tinyqv_psram_type) },
+static const mp_rom_map_elem_t pdm_module_globals_table[] = {
+    { MP_ROM_QSTR(MP_QSTR___name__),            MP_ROM_QSTR(MP_QSTR__pdm) },
+    { MP_ROM_QSTR(MP_QSTR_Pdm),    MP_ROM_PTR(&tinyqv_pdm_type) },
 };
-static MP_DEFINE_CONST_DICT(psram_module_globals, psram_module_globals_table);
+static MP_DEFINE_CONST_DICT(pdm_module_globals, pdm_module_globals_table);
 
-const mp_obj_module_t mp_module_psram = {
+const mp_obj_module_t mp_module_pdm = {
     .base = { &mp_type_module },
-    .globals = (mp_obj_dict_t *)&psram_module_globals,
+    .globals = (mp_obj_dict_t *)&pdm_module_globals,
 };
 
-MP_REGISTER_MODULE(MP_QSTR__psram, mp_module_psram);
+MP_REGISTER_MODULE(MP_QSTR__pdm, mp_module_pdm);
